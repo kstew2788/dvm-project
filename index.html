@@ -1,43 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    body > h1:nth-of-type(1) {
-      cursor: pointer
-    }
-
-    body {
-      --title-bar-height: 42px;
-      padding-top: var(--title-bar-height);
-    }
-
-    #bar {
-      background: rgba(55, 60, 72, 0.6);
-      backdrop-filter: blur(64px);
-      -webkit-app-region: drag;
-      height: var(--title-bar-height);
-      padding: 0;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      color: #FFF;
-      white-space: nowrap;
-      box-sizing: border-box;
-      position: fixed;
-      z-index: 2;
-      width: 100%;
-      left: 0;
-      top: 0;
-    }
-
-    pear-ctrl[data-platform=darwin] {
-      margin-top: 18px;
-      margin-left: 12px;
-    }
-  </style>
-  <script type='module' src='./app.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Vending Machine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="url"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #jobResults li {
+            border-left: 5px solid #3498db;
+        }
+        #windowControls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        #windowControls button {
+            margin-left: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <div id="bar"><pear-ctrl></pear-ctrl></div>
-  <h1>dvm-project</h1>
+    <div id="windowControls">
+        <button id="minimizeBtn">-</button>
+        <button id="restoreBtn">□</button>
+        <button id="closeBtn">×</button>
+    </div>
+
+    <h1>Data Vending Machine</h1>
+
+    <h2>Register AI Provider</h2>
+    <form id="providerForm">
+        <input type="text" id="jobTypes" placeholder="Job Types (comma-separated)" required>
+        <input type="url" id="endpoint" placeholder="API Endpoint" required>
+        <button type="submit">Register Provider</button>
+    </form>
+
+    <h2>Registered Providers</h2>
+    <ul id="providerList"></ul>
+
+    <h2>Request New Job Type</h2>
+    <form id="jobTypeForm">
+        <input type="text" id="newJobType" placeholder="New Job Type" required>
+        <button type="submit">Request Job Type</button>
+    </form>
+
+    <h2>Available Job Types</h2>
+    <ul id="jobTypeList"></ul>
+
+    <h2>Submit Job</h2>
+    <form id="jobForm">
+        <select id="jobType"></select>
+        <textarea id="inputData" placeholder="Input Data" required></textarea>
+        <input type="number" id="expectedOutputSize" placeholder="Expected Output Size (tokens/pixels)" required>
+        <button type="submit">Submit Job</button>
+    </form>
+
+    <h2>Job Results</h2>
+    <ul id="jobResults"></ul>
+
+    <h2>Reviews</h2>
+    <button id="showReviewsBtn">Show Reviews</button>
+    <button id="leaveReviewBtn">Leave a Review</button>
+
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Leave a Review</h2>
+            <form id="reviewForm">
+                <select id="reviewRating" required>
+                    <option value="">Select rating</option>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+                <textarea id="reviewText" placeholder="Your review" required></textarea>
+                <button type="submit">Submit Review</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="reviewsListModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Reviews</h2>
+            <ul id="reviewsList"></ul>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
 </body>
 </html>

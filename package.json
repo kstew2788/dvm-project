@@ -13,10 +13,10 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "brittle": "^3.0.0"
+    "brittle": "^3.5.2"
   },
   "scripts": {
-    "dev": "pear dev",
-    "test": "brittle test/*.test.js"
-  }
+  "dev": "pear dev",
+  "test": "brittle test/*.test.js"
+}
 }
